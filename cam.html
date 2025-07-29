@@ -1,0 +1,14 @@
+<button onclick="openCamera()">Prendre une photo</button>
+<video id="video" autoplay></video>
+
+<script>
+  function openCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        document.getElementById('video').srcObject = stream;
+      })
+      .catch(err => {
+        alert("Permission refusée ou erreur : " + err);
+      });
+  }
+</script>
