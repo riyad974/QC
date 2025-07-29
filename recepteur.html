@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Récepteur</title>
+  <meta charset="UTF-8" />
+  <title>Récepteur (ordinateur)</title>
 </head>
 <body>
   <h2>🖥️ Récepteur (ordi)</h2>
-  <label>Entrez l’ID de l’émetteur :
+  <label>Entrez l’ID de l’émetteur : 
     <input type="text" id="peerIdInput">
   </label>
   <button onclick="connect()">Se connecter</button>
 
-  <video id="remoteVideo" autoplay playsinline controls style="width: 100%; max-width: 500px; margin-top: 20px;"></video>
+  <video id="remoteVideo" autoplay playsinline controls style="width:100%;max-width:500px; margin-top: 20px;"></video>
 
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script>
@@ -19,11 +19,23 @@
 
     function connect() {
       const peerId = document.getElementById('peerIdInput').value.trim();
+      if (!peerId) {
+        alert("Veuillez entrer un ID.");
+        return;
+      }
+
+      // Ici on appelle l'émetteur, mais on ne transmet aucun flux (null)
+      // Ça déclenche l'appel côté émetteur pour répondre avec son flux caméra
       const call = peer.call(peerId, null);
+
       call.on('stream', stream => {
         document.getElementById('remoteVideo').srcObject = stream;
       });
+
+      call.on('error', err => alert('Erreur call : ' + err));
     }
+
+    peer.on('error', err => alert('Erreur PeerJS : ' + err));
   </script>
 </body>
 </html>
