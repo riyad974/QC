@@ -6,16 +6,32 @@
 </head>
 <body>
   <h2>🖥️ Récepteur (ordi)</h2>
-  <label>Entrez l’ID de l’émetteur : 
-    <input type="text" id="peerIdInput">
-  </label>
-  <button onclick="connect()">Se connecter</button>
 
-  <video id="remoteVideo" autoplay playsinline controls style="width:100%;max-width:500px; margin-top: 20px;"></video>
+  <p>Connexion à l’ID : <strong id="peerIdDisplay">chargement...</strong></p>
+  <input type="hidden" id="peerIdInput">
+
+  <video id="remoteVideo" autoplay playsinline controls style="width:100%; max-width:500px; margin-top: 20px;"></video>
 
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script>
     const peer = new Peer();
+
+    // Récupération de l’ID dans l’URL (ex: ?id=xxxxx)
+    const urlParams = new URLSearchParams(window.location.search);
+    const peerIdFromUrl = urlParams.get("id");
+
+    if (!peerIdFromUrl) {
+      document.getElementById("peerIdDisplay").textContent = "❌ Aucun ID fourni dans l’URL.";
+      alert("❌ Aucune ID d’émetteur trouvée dans l’URL. Ajoutez ?id=xxxxx à l’adresse.");
+    } else {
+      document.getElementById("peerIdInput").value = peerIdFromUrl;
+      document.getElementById("peerIdDisplay").textContent = peerIdFromUrl;
+
+      // Quand PeerJS est prêt, on se connecte
+      peer.on("open", () => {
+        connect();
+      });
+    }
 
     function connect() {
       const peerId = document.getElementById('peerIdInput').value.trim();
@@ -24,15 +40,13 @@
         return;
       }
 
-      // Ici on appelle l'émetteur, mais on ne transmet aucun flux (null)
-      // Ça déclenche l'appel côté émetteur pour répondre avec son flux caméra
-      const call = peer.call(peerId, null);
+      const call = peer.call(peerId, null); // Appel sans stream sortant
 
       call.on('stream', stream => {
         document.getElementById('remoteVideo').srcObject = stream;
       });
 
-      call.on('error', err => alert('Erreur call : ' + err));
+      call.on('error', err => alert('Erreur lors de l’appel : ' + err));
     }
 
     peer.on('error', err => alert('Erreur PeerJS : ' + err));
