@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Récepteur</title>
+</head>
+<body>
+  <h2>🖥️ Récepteur (ordi)</h2>
+  <label>Entrez l’ID de l’émetteur :
+    <input type="text" id="peerIdInput">
+  </label>
+  <button onclick="connect()">Se connecter</button>
+
+  <video id="remoteVideo" autoplay playsinline controls style="width: 100%; max-width: 500px; margin-top: 20px;"></video>
+
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script>
+    const peer = new Peer();
+
+    function connect() {
+      const peerId = document.getElementById('peerIdInput').value.trim();
+      const call = peer.call(peerId, null);
+      call.on('stream', stream => {
+        document.getElementById('remoteVideo').srcObject = stream;
+      });
+    }
+  </script>
+</body>
+</html>
