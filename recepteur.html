@@ -6,23 +6,27 @@
 </head>
 <body>
   <h2>🖥️ Récepteur (ordi)</h2>
-  <label>Entrez l’ID de l’émetteur :
-    <input type="text" id="peerIdInput">
-  </label>
-  <button onclick="connect()">Se connecter</button>
-
+  <p>ID de l’émetteur : <span id="peerIdDisplay">...</span></p>
   <video id="remoteVideo" autoplay playsinline controls style="width: 100%; max-width: 500px; margin-top: 20px;"></video>
 
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script>
-    const peer = new Peer();
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
 
-    function connect() {
-      const peerId = document.getElementById('peerIdInput').value.trim();
+    const peer = new Peer();
+    const peerId = getQueryParam("peer");
+
+    if (peerId) {
+      document.getElementById("peerIdDisplay").textContent = peerId;
+
       const call = peer.call(peerId, null);
       call.on('stream', stream => {
         document.getElementById('remoteVideo').srcObject = stream;
       });
+    } else {
+      document.body.innerHTML += `<p style="color: red;">❗ Aucune ID d’émetteur dans l’URL.</p>`;
     }
   </script>
 </body>
