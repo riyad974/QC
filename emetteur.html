@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Émetteur</title>
+  <meta charset="UTF-8" />
+  <title>Émetteur (téléphone)</title>
 </head>
 <body>
   <h2>📱 Émetteur (téléphone)</h2>
-  <p>Mon ID PeerJS : <span id="my-id">...</span></p>
-  <video id="localVideo" autoplay muted playsinline style="width: 100%; max-width: 300px;"></video>
+  <p>ID : <span id="myId">...</span></p>
+
+  <video id="myVideo" autoplay playsinline muted style="width:100%;max-width:400px;"></video>
 
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script>
     const peer = new Peer();
 
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+      document.getElementById('myVideo').srcObject = stream;
+
+      peer.on('call', call => {
+        // Quand quelqu'un appelle, on répond avec notre flux caméra + micro
+        call.answer(stream);
+      });
+    }).catch(err => alert('Erreur caméra/micro : ' + err));
+
     peer.on('open', id => {
-      document.getElementById('my-id').textContent = id;
+      document.getElementById('myId').textContent = id;
     });
-
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        document.getElementById('localVideo').srcObject = stream;
-
-        peer.on('call', call => {
-          call.answer(stream);
-        });
-      })
-      .catch(err => alert("Erreur accès caméra/micro : " + err));
   </script>
 </body>
 </html>
